@@ -162,6 +162,11 @@ class MaestroArticulo(db.Model):
     Activo = Column(Boolean, nullable=False)
     Venta = Column(Boolean, nullable=False)
 
+    def serialize(self):
+        return {
+            'IDArticulo': self.IDArticulo,
+            'Descripcion': self.DescArticulo,
+        }
 
 
 @dataclass
@@ -190,7 +195,7 @@ class OrdenFabricacion(db.Model):
             'IDArticulo': self.IDArticulo,
             'FechaCreacion': self.FechaCreacion,
             'IDCentroGestion': self.IDCentroGestion,
-            'QFabricar': float(self.QFabricar),  
+            'QFabricar': float(self.QFabricar),
             'QIniciada': float(self.QIniciada),
             'QFabricada': float(self.QFabricada),
             'QRechazada': float(self.QRechazada),
