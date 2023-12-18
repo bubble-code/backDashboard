@@ -41,7 +41,7 @@ class GetSubfamilias:
         try:
             conn = self.Open_Conn_Industry()
             if conn:
-                print("Get DatosArtIndustry")
+                print("Get sub familia from Industry")
                 query = text(
                     f"SELECT DISTINCT MFamilia.Codigo, MFamilia.Descripcion FROM MFamilia INNER JOIN MArticulo ON MFamilia.Codigo = MArticulo.Familia WHERE (MArticulo.TipoArticulo = N'{tipo}') GROUP BY MFamilia.Codigo, MFamilia.Descripcion")
                 result = conn.execute(query).fetchall()
@@ -58,13 +58,15 @@ class GetSubfamilias:
         try:
             conn = self.Open_Conn_Solmicro()
             if conn:
-                for IDSubfamilia in listSubfamilia:
-                    query = text(f"SELECT top(1) IDSubfamilia FROM tbMaestroSubfamilia WHERE where IDFamilia = 'VENTACLIEN'  and IDSubfamilia =N'{IDSubfamilia}' ")
+                print("Check subFamilia in Solmicro")
+                for IDSubfamilia, descrip in listSubfamilia:
+                    query = text(f"SELECT top(1) IDSubfamilia FROM tbMaestroSubfamilia WHERE IDFamilia = 'VENTACLIEN'  and IDSubfamilia = N'{IDSubfamilia}' ")
                     result = conn.execute(query).fetchone()
                     if not result:
                         resultados.append(IDSubfamilia)
                 conn.commit()
                 conn.close()
+                print("Completado")
             return resultados
         except Exception as e:
             print("Error en la consulta:", e)
@@ -76,3 +78,12 @@ class GetSubfamilias:
         df = pd.DataFrame(subFamiliasList,columns=["SubFamilias"])
         df.to_excel("Subfamilias.xlsx", index=False)
         print("End Exportacion")
+
+
+obj = GetSubfamilias()
+listSubfamiliaIndustry = obj.get_subfamiliIndustry()
+print(len(listSubfamiliaIndustry))
+input("Continuar")
+checkSubFamiliaSolmicro = obj.checkSubFamiliaSolmicro(listSubfamilia=listSubfamiliaIndustry)
+input("Continuar")
+obj.export_subFamilias_excel(subFamiliasList=checkSubFamiliaSolmicro)

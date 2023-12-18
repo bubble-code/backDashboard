@@ -38,21 +38,7 @@ class DatosArticulos:
         except Exception as e:
             print("Error opening connection: ", e)
 
-    def getDatosArtIndustry(self):
-        try:
-            conn = self.Open_Conn_Industry()
-            if conn:
-                print("Get DatosArtIndustry")
-                query = text(
-                    f"SELECT CodigoArticulo, Descripcion, Familia, Subfamilia, UltimoPrecioCoste, PrecioCosteMedio, ProveedorHabitual, PlazoAprovisionam, PlazoSeguridad, SerieMinimaRentable, TipoArticulo, StockMinimo,StockMaximo, Existencia, UnidReservadas, UnidOrdenadas, Codigo2, Codigo3, FechaUltimaCompra, FechaUltimaEntrada, FechaUltimaSalida, FechaCreacion, PesoNeto, PesoBruto, UnidMedidaCompra, UnidMedidaVenta,UnidMedidaAlmacen, MultiploFabricacion, TipoEnvase, CantidadEnvase, NumPlano, CodigoMoldeMatriz, EstadoArticulo, UnidConverCompra, AlmacenDefecto, CodigoUltimoProv, Inventariable, UbicacionDefecto, FechaDeAlta, FechaUltimaModificacion, UsuarioAlta, UsuarioModificacion, Version, GuardaVersion, Descripcion2, SumatorioComponentes, UnidConverVenta, PrecioCosteStandard, PrecioCompra, PrecioCompraDivisa, CodigoMoneda,PorcIVA, PorcRecargo, ABC, Trazabilidad, CriterioAsignacionLote, NumeroSerie, DiasCuarentena, RevisionPlano, FechaUltimaRevisionPlano, UnidMedidasEnvase, MedidaEnvaseLargo, MedidaEnvaseAncho, MedidaEnvaseAlto, UnidVolumenEnvase, MedidaEnvaseVolumen, ClientePrincipal, ClienteExclusivo, PrecioHIFO, FechaPrecioHIFO, MultiploConsumo, LotificacionPropia, ValorNumeroSerie, CosteStandarMOE, PrecioVenta, IDDocumAdjuntos,MesesGarantia, SistemaDistribucionObjetivos, PorcComision, CodNomenclaturaCombinada, RegimenEstadisticoHabitual, NaturalezaTransaccionA, NaturalezaTransaccionB, CodUnidadSuplem, FactorConversionSuplem, ClaseArticulo, Plantilla, GeneradorPlantilla, CodigoEstructura, EjecucionEN15085, TipoImpuesto, TipoArticuloVariantes, MesesCaducidad, Contador, Generico, FijarCosteStandard, Despunte, PorcRecuperado, altCantidadPorLote,DiasCaducidad, Pantone, RAL, CodigoAdicionalIntrastat, ExcluirEnIntrastat, DiasCaducidadInterna, MesesCaducidadInterna, MinimoCompra, PorcIGIC, VersionDesc, AplicaRedondeo, DecimalesRedondeo, Kit, UltimoPrecioCosteConInd, ProductoECommerce, ProductoDestacadoECommerce, AplicarRedondeoAlza, NumOperacionesTotales, NumOperacionesSerieLarga, Notificaciones, CtrlLimitePrecioVenta, CodigoEstructura1,LoteEntrega, DiasAprovComprasMasLargo FROM MArticulo WHERE TipoArticulo = 1")
-                result = conn.execute(query).fetchall()
-                print("Completed")
-                return result
-        except Exception as e:
-            print("Error en la consulta:", e)
-        finally:
-            if conn:
-                conn.close()
+    
 
     def GetSubFamilias(self,familia,subList):
         resultados = []
@@ -100,169 +86,7 @@ class DatosArticulos:
         return self.GetCheckSubFamiliasSolmicro(session=session)
 
 
-    def serializer(self, datos):
-        result = []
-        print("Serializing")
-        for linea in datos:
-            result.append(
-                {
-                    "IDArticulo": linea[0],
-                    "DescArticulo": linea[1],
-                    "IDContador": None,
-                    "FechaAlta": "2023-12-15 00:00:00.383",
-                    "IDEstado": 0,
-                    "IDTipo": linea[10],
-                    "IDFamilia": "VENTACLIEN" if linea[10] == 1 else linea[2],
-                    "IDSubfamilia": linea[2] if linea[10] == 1 else linea[3],
-                    "CCVenta": "70000000" if linea[10] == 1 else None,
-                    "CCExport": None,
-                    "CCCompra": "60700006" if linea[10] == 4 else None,
-                    "CCImport": None,
-                    "CCVentaRegalo": None,
-                    "CCStocks": None,
-                    "IDTipoIva": "NOR",
-                    "IDPartidaEstadistica": None,
-                    "IDUdInterna": linea[26],
-                    "IDUdVenta": linea[25],
-                    "IDUdCompra": linea[24],
-                    "PrecioEstandarA": linea[47],
-                    "PrecioEstandarB": linea[47],
-                    "FechaEstandar": "2023-12-15 00:00:00.383",
-                    "UdValoracion": 1,
-                    "PesoNeto": linea[22],
-                    "PesoBruto": linea[23],
-                    "TipoEstructura": 0,
-                    "IDTipoEstructura": None,
-                    "TipoRuta": 0,
-                    "IDTipoRuta": None,
-                    "CodigoBarras": None,
-                    "PuntoVerde": 0.00000000,
-                    "PVPMinimo": linea[74],
-                    "PorcentajeRechazo": 0,
-                    "Plazo": linea[7],
-                    "Volumen": 0,
-                    "RecalcularValoracion": 1,
-                    "CriterioValoracion": 0,
-                    "GestionStockPorLotes": 0,
-                    "PrecioUltimaCompraA": 0.00000000,
-                    "PrecioUltimaCompraB": 0.00000000,
-                    "FechaUltimaCompra": None,
-                    "IDProveedorUltimaCompra": None,
-                    "LoteMultiplo": 0,
-                    "CantMinSolicitud": 0,
-                    "CantMaxSolicitud": 0,
-                    "LimitarPetDia": 0,
-                    "IdArticuloConfigurado": None,
-                    "ContRadical": None,
-                    "IdFamiliaConfiguracion": None,
-                    "PrecioBase": linea[74],
-                    "Configurable": 0,
-                    "FechaCreacionAudi": "2023-12-15 00:00:00.383",
-                    "FechaModificacionAudi": "2023-12-15 00:00:00.383",
-                    "UsuarioAudi": f"favram\\a.obregon",
-                    "NivelPlano": linea[30],
-                    "StockNegativo": 0,
-                    "PlazoFabricacion": linea[7],
-                    "ParamMaterial": 3 if linea[10] == 1 else None,
-                    "ParamTerminado": 1 if linea[10] == 1 else None,
-                    "ParamTerminado": 0.00000000,
-                    "AplicarLoteMRP": 0,
-                    "NSerieObligatorio": 0,
-                    "PuntosMarketing": 0,
-                    "ValorPuntosMarketing": 0,
-                    "ValorReposicionA": 0.00000000,
-                    "ValorReposicionB": 0.00000000,
-                    "FechaValorReposicion": None,
-                    "ControlRecepcion": 0,
-                    "IDEstadoHomologacion": None,
-                    "IDArticuloFinal": None,
-                    "GenerarOFArticuloFinal": 0,
-                    "IdDocumentoEspecificacion": None,
-                    "NivelModificacionPlan": None,
-                    "FechaModificacionNivelPlan": None,
-                    "TipoFactAlquiler": 0,
-                    "Seguridad": 0,
-                    "Reglamentacion": 0,
-                    "SeguridadReglamentacion": 0,
-                    "DiasMinimosFactAlquiler": 0,
-                    "SinDtoEnAlquiler": 0,
-                    "SinSeguroEnAlquiler": 0,
-                    "NecesitaOperario": 0,
-                    "IDConcepto": None,
-                    "CCVentaGRUPO": None,
-                    "CCExportGRUPO": None,
-                    "CCImportGRUPO": None,
-                    "CCCompraGRUPO": None,
-                    "FacturacionAsociadaMaq": 0,
-                    "FactTasaResiduos": 0,
-                    "NoImprimirEnFactura": 0,
-                    "IDArticuloContenedor": None,
-                    "QContenedor": None,
-                    "IDArticuloEmbalaje": None,
-                    "QEmbalaje": None,
-                    "Color": None,
-                    "IDCaracteristicaArticulo1": None,
-                    "IDCaracteristicaArticulo2": None,
-                    "IDCaracteristicaArticulo3": None,
-                    "IDCaracteristicaArticulo4": None,
-                    "IDCaracteristicaArticulo5": None,
-                    "IDArticuloPadre": None,
-                    "TipoPrecio": None,
-                    "IDTipoProducto": None,
-                    "IDTipoMaterial": None,
-                    "IDTipoSubMaterial": None,
-                    "IDTipoEnvase": None,
-                    "IDComerIndus": None,
-                    "IDTipoIVAReducido": None,
-                    "IDUdInterna2": None,
-                    "Observaciones": None,
-                    "PorcenIVANoDeducible": None,
-                    "PrecioBaseConfigurado": None,
-                    "Alias": None,
-                    "IDCategoria": None,
-                    "IDAnada": None,
-                    "IDColorVino": None,
-                    "IDCategoriaVino": None,
-                    "IDFormato": None,
-                    "IDMarcaComercial": None,
-                    "IDEmpresa": None,
-                    "INFAPNecesitaOperario": None,
-                    "RetencionIRPF": 1,
-                    "IncluirEnEMCS": 0,
-                    "ClaveDeclaracion": None,
-                    "IDRegistroFitosanitario": None,
-                    "RiquezaNPK": None,
-                    "IDTipoAbono": None,
-                    "IDTipoFertilizacion": None,
-                    "ClaveProductoSilicie": None,
-                    "TipoEnvaseSilicie": None,
-                    "ExcluirSilicie": 0,
-                    "IDCalificacion": None,
-                    "IDProductoVino": None,
-                    "IDPaisOrigen": None,
-                    "CodigoEstructura": None,
-                    "Certif31": None,
-                    "Ubicacion": None,
-                    "Codigo3": None,
-                    "Descripcion2": None,
-                    "INFAPP": None,
-                    "EJEN15085": None,
-                    "TIPO15085": None,
-                    "TIPO15085": None,
-                    "ExcluirCupos": 0,
-                    "IDCampanaCupoClasificacion": None,
-                    "KGPlastico": None,
-                    "KGPlasticoNR": None,
-                    "ClaveProducto": None,
-                    "GestionContraPedidoVenta": 0,
-                    "UsuarioCreacionAudi": None,
-                    "Espesor": None,
-                    "Activo": 1,
-                    "Venta": 1
-                }
-            )
-        print("End Serializado")
-        return result
+    
     
     def GetColumnExcel(self,nameColumn):
         print("Obteniendo datos desde Excel")
@@ -287,12 +111,7 @@ class DatosArticulos:
         except Exception as e:
             print("Error Excel: ",e)
 
-    @staticmethod
-    def export_to_excel_art_desd_indus(data):
-        print("Exporting")
-        df = pd.DataFrame(data, columns=["IDArticulo",	"DescArticulo",	"IDContador",	"FechaAlta",	"IDEstado",	"IDTipo",	"IDFamilia",	"IDSubfamilia",	"CCVenta",	"CCExport",	"CCCompra",	"CCImport",	"CCVentaRegalo",	"CCGastoRegalo",	"CCStocks",	"IDTipoIva",	"IDPartidaEstadistica",	"IDUdInterna",	"IDUdVenta",	"IDUdCompra",	"PrecioEstandarA",	"PrecioEstandarB",	"FechaEstandar",	"UdValoracion",	"PesoNeto",	"PesoBruto",	"TipoEstructura",	"IDTipoEstructura",	"TipoRuta",	"IDTipoRuta",	"CodigoBarras",	"PuntoVerde",	"PVPMinimo",	"PorcentajeRechazo",	"Plazo",	"Volumen",	"RecalcularValoracion",	"CriterioValoracion",	"GestionStockPorLotes",	"PrecioUltimaCompraA",	"PrecioUltimaCompraB",	"FechaUltimaCompra",	"IDProveedorUltimaCompra",	"LoteMultiplo",	"CantMinSolicitud",	"CantMaxSolicitud",	"LimitarPetDia",	"IdArticuloConfigurado",	"ContRadical",	"IdFamiliaConfiguracion",	"PrecioBase",	"Configurable",	"FechaCreacionAudi",	"FechaModificacionAudi",	"UsuarioAudi",	"NivelPlano",	"StockNegativo",	"PlazoFabricacion",	"ParamMaterial",	"ParamTerminado",	"CapacidadDiaria",	"AplicarLoteMRP",	"NSerieObligatorio",	"PuntosMarketing",	"ValorPuntosMarketing",	"ValorReposicionA",	"ValorReposicionB",	"FechaValorReposicion",	"ControlRecepcion",	"IDEstadoHomologacion",	"IDArticuloFinal",	"GenerarOFArticuloFinal",	"IdDocumentoEspecificacion",	"NivelModificacionPlan",	"FechaModificacionNivelPlan",	"TipoFactAlquiler","Seguridad",	"Reglamentacion",	"SeguridadReglamentacion",	"DiasMinimosFactAlquiler",	"SinDtoEnAlquiler",	"SinSeguroEnAlquiler",	"NecesitaOperario",	"IDConcepto",	"CCVentaGRUPO",	"CCExportGRUPO",	"CCImportGRUPO",	"CCCompraGRUPO",	"FacturacionAsociadaMaq",	"FactTasaResiduos",	"NoImprimirEnFactura",	"IDArticuloContenedor",	"QContenedor",	"IDArticuloEmbalaje",	"QEmbalaje",	"Color",	"IDCaracteristicaArticulo1",	"IDCaracteristicaArticulo2",	"IDCaracteristicaArticulo3",	"IDCaracteristicaArticulo4",	"IDCaracteristicaArticulo5",	"IDArticuloPadre",	"TipoPrecio",	"IDTipoProducto",	"IDTipoMaterial",	"IDTipoSubMaterial",	"IDTipoEnvase",	"IDComerIndus",	"IDTipoIVAReducido",	"IDUdInterna2",	"Observaciones",	"PorcenIVANoDeducible",	"PrecioBaseConfigurado",	"Alias",	"IDCategoria",	"IDAnada",	"IDColorVino",	"IDCategoriaVino",	"IDFormato",	"IDMarcaComercial",	"IDEmpresa",	"RetencionIRPF",	"IncluirEnEMCS",	"ClaveDeclaracion",	"IDRegistroFitosanitario",	"RiquezaNPK",	"IDTipoAbono",	"IDTipoFertilizacion",	"ClaveProductoSilicie",	"TipoEnvaseSilicie",	"ExcluirSilicie",	"IDCalificacion",	"IDProductoVino",	"IDPaisOrigen",	"CodigoEstructura",	"Certif31",	"Ubicacion",	"Codigo3",	"Descripcion2",	"INFAPP",	"EJEN15085",	"TIPO15085",	"ExcluirCupos",	"IDCampanaCupoClasificacion",	"KGPlastico",	"KGPlasticoNR",	"ClaveProducto",	"GestionContraPedidoVenta",	"UsuarioCreacionAudi",	"Espesor",	"Activo",	"Venta"])
-        df.to_excel("ArtFormateados.xlsx", index=False)
-        print("End Exportacion")
+
     
     @staticmethod
     def export_subFamilias_excel(subFamiliasList):
