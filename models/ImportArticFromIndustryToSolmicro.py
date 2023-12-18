@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, text, bindparam, Integer
+from sqlalchemy import create_engine, text, bindparam, Integer, select
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
 from Subfamilia import MaestroSubfamilia
@@ -76,10 +76,18 @@ class DatosArticulos:
     def GetCheckSubFamiliasSolmicro(self, IDTipo=None, IDFamilia=None, IDSubfamilia=None, session=None):
         Session = sessionmaker(bind=self.connection_string_solmicro)
         session = Session()
-        query =  session.query(MaestroSubfamilia).yield_per(100)
-        registros = query.all()
+        stmt = session.query(MaestroSubfamilia)
+        # if IDTipo is not None:
+        #     stmt = stmt.filter(MaestroSubfamilia.IDTipo == IDTipo)
+        # if IDFamilia is not None:
+        #     stmt = stmt.filter(MaestroSubfamilia.IDFamilia == IDFamilia)
+        # if IDSubfamilia is not None:
+        #     stmt = stmt.filter(MaestroSubfamilia.IDSubfamilia == IDSubfamilia)
+
+        query =  stmt.scalar_subquery()
+        # registros = query.all()
         session.close()
-        return registros
+        return query
     
     def check_subfamilia(self):
         resultados = []
