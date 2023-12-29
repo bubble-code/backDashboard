@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine, text, bindparam, Integer, select
+from sqlalchemy.orm import sessionmaker
 
 
 class MainConexion:
@@ -34,3 +35,41 @@ class MainConexion:
             return self.connection
         except Exception as e:
             print("Error opening connection: ", e)
+
+    def _open_session_solmicro(self):
+        return sessionmaker(bind= self.Open_Conn_Solmicro())()
+    
+    def _open_session_industry(self):
+        return sessionmaker(bind= self.Open_Conn_Industry())()
+
+    def RunProcedure(self,rango):
+        conn = None
+        try:
+            conn = self.Open_Conn_Solmicro()
+            if conn:
+                for dato in range(rango):
+                    query = text("EXEC xAutonumericValue;")
+                    conn.execute(query)
+                    conn.commit()
+        except Exception as e:
+            print("Error ejecutando el procedimiento almacenado:", e)
+            return None
+        finally:
+            if conn:
+                conn.close()
+
+    def GetAutonumericValue(self):
+        conn = None
+        try:
+            conn = self.Open_Conn_Solmicro()
+            if conn:
+                query = text("SELECT autonumber FROM  ale_autoNumber")
+                result = conn.execute(query).fetchall()
+                final_result = [ value for row in result for value in row ]
+                return final_result
+        except Exception as e:
+            print("Error ejecutando el procedimiento almacenado:", e)
+            return None
+        finally:
+            if conn:
+                conn.close()
