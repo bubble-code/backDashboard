@@ -43,7 +43,7 @@ class GetSubfamilias:
             if conn:
                 print("Get sub familia from Industry")
                 query = text(
-                    f"SELECT DISTINCT MFamilia.Codigo, MFamilia.Descripcion FROM MFamilia INNER JOIN MArticulo ON MFamilia.Codigo = MArticulo.Familia WHERE (MArticulo.TipoArticulo = N'{tipo}') GROUP BY MFamilia.Codigo, MFamilia.Descripcion")
+                    f"SELECT DISTINCT MFamilia.Codigo, MFamilia.Descripcion, MArticulo.TipoArticulo FROM MFamilia INNER JOIN MArticulo ON MFamilia.Codigo = MArticulo.Familia WHERE (MArticulo.TipoArticulo = N'{tipo}') GROUP BY MFamilia.Codigo, MFamilia.Descripcion")
                 result = conn.execute(query).fetchall()
                 print("Completed")
                 return result
@@ -71,6 +71,14 @@ class GetSubfamilias:
         except Exception as e:
             print("Error en la consulta:", e)
             return resultados
+    
+    def serializer(self,data):
+        result =[]
+        print("Serializando datos")
+        for row in data:
+            result.append({
+
+            })
         
     @staticmethod
     def export_subFamilias_excel(subFamiliasList):
@@ -81,7 +89,7 @@ class GetSubfamilias:
 
 
 obj = GetSubfamilias()
-listSubfamiliaIndustry = obj.get_subfamiliIndustry()
+listSubfamiliaIndustry = obj.get_subfamiliIndustry(tipo=4)
 print(len(listSubfamiliaIndustry))
 input("Continuar")
 checkSubFamiliaSolmicro = obj.checkSubFamiliaSolmicro(listSubfamilia=listSubfamiliaIndustry)
