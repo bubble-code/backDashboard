@@ -11,6 +11,7 @@ class Ruta:
     
     def getDatosRutaIndustry(self):
         mainConexion = MainConexion()
+        grouped_result = {}
         try:
             conn = mainConexion.Open_Conn_Industry()
             if conn:
@@ -19,17 +20,37 @@ class Ruta:
                     f"SELECT Articulo, Fase, Descripcion, TipoFase, Centro, Ritmo, OperariosOperacion, OperariosPreparacion, TiempoPreparacion, TipoUtillaje, CodigoPreparacion, LoteMinimo, LoteLiberacion, FechaDeAlta,FechaUltimaModificacion, UsuarioAlta, UsuarioModificacion, Autocontrol, Version, GuardaVersion, UnidadesPorCiclo, TiempoCiclo, UnidadTiempoCiclo, IDDocumAdjuntos, TiempoHorasPieza, UnidadHorasPieza,CodigoMixProduction, Paralelo, RitmoCrono FROM MFase")
                 result = conn.execute(query).fetchall()
                 print("Completado")
-                return result
-                # grouped_result = {}
+                return result                
                 # for row in result:
-                #     padre = row['Padre']
-                #     if padre not in grouped_result:
-                #         grouped_result[padre] = []
-                #     grouped_result[padre].append(row)
+                #     articulo = row[0]
+                #     if articulo not in grouped_result:
+                #         grouped_result[articulo] = []
+                #     grouped_result[articulo].append(row)
                 # print("Completed")
                 # return grouped_result
         except Exception as e:
             print("Error en la consulta:", e)
+        finally:
+            if conn:
+                conn.close()
+
+    def checkRuta(self,data):
+        mainConexion = MainConexion()
+        fases = []
+        try:
+            conn = mainConexion.Open_Conn_Solmicro()
+            if conn:
+                for articulo in data:
+                    print(articulo)
+                    query = text(f"SELECT IDRutaOp, IDArticulo, IDRuta, Secuencia, TipoOperacion, IDOperacion, DescOperacion, Critica, IDCentro, FactorHombre, IDUdProduccion, CantidadTiempo, UdTiempo, FactorProduccion, ControlProduccion, IDTipoRuta, TiempoPrep, UdTiempoPrep, TiempoEjecUnit, UdTiempoEjec, FechaCreacionAudi, FechaModificacionAudi, UsuarioAudi, TiempoCiclo, UdTiempoCiclo, LoteCiclo, PlazoSub, UdTiempoPlazo, SolapePor, Ciclo, Rendimiento, IDCContable, IdDocumentoEspecificacion, CantidadTiempo100, SolapeLote, OcupacionMaquina, Texto, UsuarioCreacionAudi, TiempoProgramacion FROM tbRuta where IDArticulo= N'{articulo}'")
+                    result = conn.execute(query).fetchall()
+                    if len(data[articulo])> len(result):
+                        for fase in data[articulo]:
+                            if fase["Fase"] != result["Secuencia"] and fase["Centro"]!=result["IDCentro"]:
+                                fases.append(fase)
+                return fases
+        except Exception as e:
+            print("Error en la consulta:",e)
         finally:
             if conn:
                 conn.close()
@@ -85,7 +106,7 @@ class Ruta:
     @staticmethod
     def export_to_excel_art_desd_indus(data):
         print("Exporting")
-        df = pd.DataFrame(data, columns=['IDRutaOp',	'IDArticulo',	'IDRuta',	'Secuencia',	'TipoOperacion',	'IDOperacion',	'DescOperacion',	'Critica',	'IDCentro',	'FactorHombre',	'IDUdProduccion',	'CantidadTiempo',	'UdTiempo',	'FactorProduccion',	'ControlProduccion',	'IDTipoRuta',	'TiempoPrep',	'UdTiempoPrep',	'TiempoEjecUnit',	'UdTiempoEjec',	'FechaCreacionAudi',	'FechaModificacionAudi',	'UsuarioAudi',	'TiempoCiclo',	'UdTiempoCiclo',	'LoteCiclo',	'PlazoSub',	'UdTiempoPlazo',	'SolapePor',	'Ciclo',	'Rendimiento',	'IDCContable',	'IdDocumentoEspecificacion',	'CantidadTiempo100',	'SolapeLote',	'OcupacionMaquina',	'Texto',	'UsuarioCreacionAudi',	'TiempoProgramacion'])
+        df = pd.DataFrame(data, columns=['IDRutaOp','IDArticulo',	'IDRuta',	'Secuencia','TipoOperacion','IDOperacion','DescOperacion','Critica','IDCentro','FactorHombre','IDUdProduccion','CantidadTiempo','UdTiempo','FactorProduccion','ControlProduccion','IDTipoRuta','TiempoPrep','UdTiempoPrep','TiempoEjecUnit','UdTiempoEjec','FechaCreacionAudi','FechaModificacionAudi','UsuarioAudi','TiempoCiclo','UdTiempoCiclo','LoteCiclo','PlazoSub','UdTiempoPlazo','SolapePor','Ciclo','Rendimiento','IDCContable','IdDocumentoEspecificacion','CantidadTiempo100','SolapeLote','OcupacionMaquina','Texto','UsuarioCreacionAudi','TiempoProgramacion'])
         df.to_excel("ImportRuta.xlsx", index=False)
         print("End Exportacion")
 
@@ -94,6 +115,8 @@ input("Creado obj")
 datos_industry = obj.getDatosRutaIndustry()
 print(len(datos_industry))
 input("continue")
+# missingFases =  obj.checkRuta(data=datos_industry)
+# print(len(missingFases))
 serielized_datos = obj.serializar(datos=datos_industry)
 input("continue")
 obj.export_to_excel_art_desd_indus(data=serielized_datos)

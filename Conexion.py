@@ -73,3 +73,6 @@ class MainConexion:
         finally:
             if conn:
                 conn.close()
+
+oo = MainConexion()
+oo.RunProcedure(rango=94164)
