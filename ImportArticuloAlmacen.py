@@ -3,6 +3,7 @@ from sqlalchemy.orm import sessionmaker
 from models.MaestroArticuloAlmacen import MaestroArticuloAlmacen
 from Conexion import MainConexion
 from CExcel import CExcel
+from ImportArticulos import ImportArticulos
 
 
 class MaestroArticuloAlmacenManager:
@@ -52,6 +53,42 @@ class MaestroArticuloAlmacenManager:
         finally:
             if session_industry:
                 session_industry.close()
+    
+    def get_articulos_from_solmicro(self):
+        try:
+            conn = self.main_conexion.Open_Conn_Solmicro()
+            if conn:
+                query = text(
+                    f"Select IDArticulo, DescArticulo, IDContador, FechaAlta, IDEstado, IDTipo, IDFamilia, IDSubfamilia, CCVenta, CCExport, CCCompra, CCImport, CCVentaRegalo, CCGastoRegalo, CCStocks, IDTipoIva, IDPartidaEstadistica,IDUdInterna, IDUdVenta, IDUdCompra, PrecioEstandarA, PrecioEstandarB, FechaEstandar, UdValoracion, PesoNeto, PesoBruto, TipoEstructura, IDTipoEstructura, TipoRuta, IDTipoRuta, CodigoBarras, PuntoVerde, PVPMinimo,PorcentajeRechazo, Plazo, Volumen, RecalcularValoracion, CriterioValoracion, GestionStockPorLotes, PrecioUltimaCompraA, PrecioUltimaCompraB, FechaUltimaCompra, IDProveedorUltimaCompra, LoteMultiplo,CantMinSolicitud, CantMaxSolicitud, LimitarPetDia, IdArticuloConfigurado, ContRadical, IdFamiliaConfiguracion, PrecioBase, Configurable, FechaCreacionAudi, FechaModificacionAudi, UsuarioAudi, NivelPlano, StockNegativo,PlazoFabricacion, ParamMaterial, ParamTerminado, CapacidadDiaria, AplicarLoteMRP, NSerieObligatorio, PuntosMarketing, ValorPuntosMarketing, ValorReposicionA, ValorReposicionB, FechaValorReposicion,ControlRecepcion, IDEstadoHomologacion, IDArticuloFinal, GenerarOFArticuloFinal, IdDocumentoEspecificacion, NivelModificacionPlan, FechaModificacionNivelPlan, TipoFactAlquiler, Seguridad, Reglamentacion,SeguridadReglamentacion, DiasMinimosFactAlquiler, SinDtoEnAlquiler, SinSeguroEnAlquiler, NecesitaOperario, IDConcepto, CCVentaGRUPO, CCExportGRUPO, CCImportGRUPO, CCCompraGRUPO, FacturacionAsociadaMaq,FactTasaResiduos, NoImprimirEnFactura, IDArticuloContenedor, QContenedor, IDArticuloEmbalaje, QEmbalaje, Color, IDCaracteristicaArticulo1, IDCaracteristicaArticulo2, IDCaracteristicaArticulo3, IDCaracteristicaArticulo4,IDCaracteristicaArticulo5, IDArticuloPadre, TipoPrecio, IDTipoProducto, IDTipoMaterial, IDTipoSubMaterial, IDTipoEnvase, IDComerIndus, IDTipoIVAReducido, IDUdInterna2, Observaciones, PorcenIVANoDeducible,PrecioBaseConfigurado, Alias, IDCategoria, IDAnada, IDColorVino, IDCategoriaVino, IDFormato, IDMarcaComercial, IDEmpresa, RetencionIRPF, IncluirEnEMCS, ClaveDeclaracion, IDRegistroFitosanitario, RiquezaNPK,IDTipoAbono, IDTipoFertilizacion,ClaveProductoSilicie, TipoEnvaseSilicie, ExcluirSilicie, IDCalificacion, IDProductoVino, IDPaisOrigen, CodigoEstructura, Certif31, Ubicacion, Codigo3, Descripcion2, INFAPP, EJEN15085, TIPO15085, ExcluirCupos, IDCampanaCupoClasificacion, KGPlastico, KGPlasticoNR, ClaveProducto, GestionContraPedidoVenta, UsuarioCreacionAudi, Espesor, Activo, Venta, IDProductoVinoDeclaracion, KitVariable,SumaPrecioTarifaKit, ImprimirDetalleKit from tbMaestroArticulo WHERE (IDTipo = N'01') OR (IDTipo = N'04')"
+                    )
+                resul = conn.execute(query).fetchall()
+            return resul
+        except Exception as e:
+            print("Error en la consulta: ",e)
+        finally:
+            if conn:
+                conn.close()
+
+    def check_articulo_almacen_solmicro(self, listArticulos):
+        resultados = []
+        try:
+            conn = self.main_conexion.Open_Conn_Solmicro()
+            if conn:
+                print("Starting")
+                query = text( f"SELECT IDArticulo FROM tbMaestroArticuloAlmacen ")
+                result = conn.execute(query).fetchall()
+                result_list = [item[0] for item in result]
+                for row in listArticulos:
+                    if row[0] not in result_list:
+                        resultados.append(row)
+                print("Check completado")
+                return resultados
+        
+        except Exception as e:
+            print("Error en la consulta: ", e)
+        finally:
+            if conn:
+                conn.close()
 
     def serializar(self, data):
         result = []
@@ -92,6 +129,46 @@ class MaestroArticuloAlmacenManager:
             })
         print("End Serializer")
         return result
+    
+    def serializar2(self, data):
+        result = []
+        print("Serializando:")
+        for item in data:
+            result.append(
+                {
+                "IDArticulo":item[0],
+                "IDAlmacen":0,
+                "StockFisico":0,
+                "PuntoPedido":0,
+                "LoteMinimo":0,
+                "StockSeguridad":0,
+                "PrecioMedioA":0,
+                "PrecioMedioB":0,
+                "StockMedio":0,
+                "Rotacion":0,
+                "Inventariado":0,
+                "FechaUltimoInventario":None,
+                "FechaUltimoAjuste":None,
+                "Predeterminado":1,
+                "GestionPuntoPedido":0,
+                "MarcaAuto":0,
+                "FechaCreacionAudi":None,
+                "FechaModificacionAudi":None,
+                "UsuarioAudi":None,
+                "PrecioFIFOFechaA":0,
+                "PrecioFIFOFechaB":0,
+                "PrecioFIFOMvtoA":0,
+                "PrecioFIFOMvtoB":0,
+                "FechaCalculo":None,
+                "StockFechaCalculo":0,
+                "IDArticuloGenerico":None,
+                "FechaUltimoMovimiento":None,
+                "StockFisico2":None,
+                "IDUbicacion":None,
+                "UsuarioCreacionAudi":None
+            })
+        print("End Serializer")
+        return result
 
     @staticmethod
     def export_to_excel(name, data):
@@ -100,8 +177,18 @@ class MaestroArticuloAlmacenManager:
         excel.export_to_excel(name, data=data, columnas=columns)
 
 
-# maestro_manager = MaestroArticuloAlmacenManager()
+maestro_manager = MaestroArticuloAlmacenManager()
+input("Creada instancia")
+articulos = maestro_manager.get_articulos_from_solmicro()
+print(len(articulos))
+input("Continue...")
+check_articulos_almacen = maestro_manager.check_articulo_almacen_solmicro(listArticulos=articulos)
+print(len(check_articulos_almacen))
+input("Continue...")
+# import_artic_obje = ImportArticulos()
 # input("Creada instancia")
+serialezados = maestro_manager.serializar2(data=check_articulos_almacen)
+maestro_manager.export_to_excel(name="ArticulosAlmacen.xlsx",data=serialezados)
 # data_from_excel = maestro_manager.df_excel()
 # print(len(data_from_excel))
 # input("Continue...")

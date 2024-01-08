@@ -211,6 +211,170 @@ class ImportArticulos:
         print("End Serializado")
         return result
     
+    def serializer2(self, datos):
+        result = []
+        print("Serializing")
+        for linea in datos:
+            result.append(
+                {
+                    "IDArticulo": linea[0],
+                    "DescArticulo": linea[1],
+                    "IDContador": linea[2],
+                    "FechaAlta": linea[3],
+                    "IDEstado": linea[4],
+                    "IDTipo": linea[5],
+                    "IDFamilia": linea[6],
+                    "IDSubfamilia": linea[7],
+                    "CCVenta": linea[8],
+                    "CCExport": linea[9],
+                    "CCCompra": linea[10],
+                    "CCImport": linea[11],
+                    "CCVentaRegalo": linea[12],
+                    "CCStocks": linea[13],
+                    "IDTipoIva": linea[14],
+                    "IDPartidaEstadistica": linea[15],
+                    "IDUdInterna": linea[16],
+                    "IDUdVenta": linea[17],
+                    "IDUdCompra": linea[18],
+                    "PrecioEstandarA": linea[19],
+                    "PrecioEstandarB": linea[20],
+                    "FechaEstandar": linea[21],
+                    "UdValoracion": linea[22],
+                    "PesoNeto": linea[23],
+                    "PesoBruto": linea[24],
+                    "TipoEstructura": linea[25],
+                    "IDTipoEstructura": linea[26],
+                    "TipoRuta": linea[27],
+                    "IDTipoRuta": linea[28],
+                    "CodigoBarras": linea[29],
+                    "PuntoVerde": linea[30],
+                    "PVPMinimo": linea[31],
+                    "PorcentajeRechazo": linea[32],
+                    "Plazo": linea[33],
+                    "Volumen": linea[34],
+                    "RecalcularValoracion": linea[35],
+                    "CriterioValoracion": linea[36],
+                    "GestionStockPorLotes": linea[37],
+                    "PrecioUltimaCompraA": linea[38],
+                    "PrecioUltimaCompraB": linea[39],
+                    "FechaUltimaCompra": linea[40],
+                    "IDProveedorUltimaCompra": linea[41],
+                    "LoteMultiplo": linea[42],
+                    "CantMinSolicitud": linea[43],
+                    "CantMaxSolicitud": linea[44],
+                    "LimitarPetDia": linea[45],
+                    "IdArticuloConfigurado": linea[46],
+                    "ContRadical": linea[47],
+                    "IdFamiliaConfiguracion": linea[48],
+                    "PrecioBase": linea[49],
+                    "Configurable": linea[50],
+                    "FechaCreacionAudi": linea[51],
+                    "FechaModificacionAudi": linea[52],
+                    "UsuarioAudi": linea[53],
+                    "NivelPlano": linea[54],
+                    "StockNegativo": linea[55],
+                    "PlazoFabricacion": linea[56],
+                    "ParamMaterial": linea[57],
+                    "ParamTerminado": linea[58],
+                    "ParamTerminado": linea[59],
+                    "AplicarLoteMRP": linea[60],
+                    "NSerieObligatorio": linea[61],
+                    "PuntosMarketing": linea[62],
+                    "ValorPuntosMarketing": linea[63],
+                    "ValorReposicionA": linea[64],
+                    "ValorReposicionB": linea[65],
+                    "FechaValorReposicion": linea[66],
+                    "ControlRecepcion": linea[67],
+                    "IDEstadoHomologacion": linea[68],
+                    "IDArticuloFinal": linea[69],
+                    "GenerarOFArticuloFinal": linea[70],
+                    "IdDocumentoEspecificacion": None,
+                    "NivelModificacionPlan": None,
+                    "FechaModificacionNivelPlan": None,
+                    "TipoFactAlquiler": 0,
+                    "Seguridad": 0,
+                    "Reglamentacion": 0,
+                    "SeguridadReglamentacion": 0,
+                    "DiasMinimosFactAlquiler": 0,
+                    "SinDtoEnAlquiler": 0,
+                    "SinSeguroEnAlquiler": 0,
+                    "NecesitaOperario": 0,
+                    "IDConcepto": None,
+                    "CCVentaGRUPO": None,
+                    "CCExportGRUPO": None,
+                    "CCImportGRUPO": None,
+                    "CCCompraGRUPO": None,
+                    "FacturacionAsociadaMaq": 0,
+                    "FactTasaResiduos": 0,
+                    "NoImprimirEnFactura": 0,
+                    "IDArticuloContenedor": None,
+                    "QContenedor": None,
+                    "IDArticuloEmbalaje": None,
+                    "QEmbalaje": None,
+                    "Color": None,
+                    "IDCaracteristicaArticulo1": None,
+                    "IDCaracteristicaArticulo2": None,
+                    "IDCaracteristicaArticulo3": None,
+                    "IDCaracteristicaArticulo4": None,
+                    "IDCaracteristicaArticulo5": None,
+                    "IDArticuloPadre": None,
+                    "TipoPrecio": None,
+                    "IDTipoProducto": None,
+                    "IDTipoMaterial": None,
+                    "IDTipoSubMaterial": None,
+                    "IDTipoEnvase": None,
+                    "IDComerIndus": None,
+                    "IDTipoIVAReducido": None,
+                    "IDUdInterna2": None,
+                    "Observaciones": None,
+                    "PorcenIVANoDeducible": None,
+                    "PrecioBaseConfigurado": None,
+                    "Alias": None,
+                    "IDCategoria": None,
+                    "IDAnada": None,
+                    "IDColorVino": None,
+                    "IDCategoriaVino": None,
+                    "IDFormato": None,
+                    "IDMarcaComercial": None,
+                    "IDEmpresa": None,
+                    "INFAPNecesitaOperario": None,
+                    "RetencionIRPF": 1,
+                    "IncluirEnEMCS": 0,
+                    "ClaveDeclaracion": None,
+                    "IDRegistroFitosanitario": None,
+                    "RiquezaNPK": None,
+                    "IDTipoAbono": None,
+                    "IDTipoFertilizacion": None,
+                    "ClaveProductoSilicie": None,
+                    "TipoEnvaseSilicie": None,
+                    "ExcluirSilicie": 0,
+                    "IDCalificacion": None,
+                    "IDProductoVino": None,
+                    "IDPaisOrigen": None,
+                    "CodigoEstructura": None,
+                    "Certif31": None,
+                    "Ubicacion": None,
+                    "Codigo3": None,
+                    "Descripcion2": None,
+                    "INFAPP": None,
+                    "EJEN15085": None,
+                    "TIPO15085": None,
+                    "TIPO15085": None,
+                    "ExcluirCupos": 0,
+                    "IDCampanaCupoClasificacion": None,
+                    "KGPlastico": None,
+                    "KGPlasticoNR": None,
+                    "ClaveProducto": None,
+                    "GestionContraPedidoVenta": 0,
+                    "UsuarioCreacionAudi": None,
+                    "Espesor": None,
+                    "Activo": 1,
+                    "Venta": 1
+                }
+            )
+        print("End Serializado")
+        return result
+    
     @staticmethod
     def export_to_excel_art_desd_indus(data):
         print("Exporting")
@@ -219,13 +383,13 @@ class ImportArticulos:
         print("End Exportacion")
 
 
-obj = ImportArticulos()
-listSubfamiliaIndustry = obj.getDatosArtIndustry(TipoArticulo=4)
-print(len(listSubfamiliaIndustry))
-input("Continuar")
-checkSubFamiliaSolmicro = obj.CheckArticuloSolmicro(listArticulos=listSubfamiliaIndustry)
-print(len(checkSubFamiliaSolmicro))
-input("Continuar")
-articulosSerialilzados = obj.serializer(datos=checkSubFamiliaSolmicro)
-input("Continuar")
-obj.export_to_excel_art_desd_indus(data=articulosSerialilzados)
+# obj = ImportArticulos()
+# listSubfamiliaIndustry = obj.getDatosArtIndustry(TipoArticulo=4)
+# print(len(listSubfamiliaIndustry))
+# input("Continuar")
+# checkSubFamiliaSolmicro = obj.CheckArticuloSolmicro(listArticulos=listSubfamiliaIndustry)
+# print(len(checkSubFamiliaSolmicro))
+# input("Continuar")
+# articulosSerialilzados = obj.serializer(datos=checkSubFamiliaSolmicro)
+# input("Continuar")
+# obj.export_to_excel_art_desd_indus(data=articulosSerialilzados)
