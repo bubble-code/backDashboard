@@ -74,5 +74,5 @@ class MainConexion:
             if conn:
                 conn.close()
 
-oo = MainConexion()
-oo.RunProcedure(rango=94164)
+# oo = MainConexion()
+# oo.RunProcedure(rango=94164)
