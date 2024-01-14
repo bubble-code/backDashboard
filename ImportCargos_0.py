@@ -6,7 +6,6 @@ class MaestroCargoManager:
         self.main_conexion = main_conexion
 
     def get_all_records(self):
-        mainConexion = MainConexion()
         try:
             conn = self.main_conexion.Open_Conn_Solmicro()
             if conn:
