@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 # from flask_sqlalchemy import SQLAlchemy
 from models.Models import db, OrdenFabricacion, MaestroArticulo
+from InfoTables import SQLTableInfo
 
 
 def create_app():
@@ -41,7 +42,6 @@ def create_app():
     @app.route('/api/articulos', methods=['GET'])
     def obtener_articulos():
         id_articulo = request.args.get('IDArticulo')
-
         if id_articulo:
             articulo = MaestroArticulo.query.filter_by(
                 IDArticulo=id_articulo).first()
@@ -53,6 +53,19 @@ def create_app():
             articulos = MaestroArticulo.query.all()
             articulos_serializados = [articulo.serialize() for articulo in articulos]
             return articulos_serializados
+        
+    @app.route('/api/obtener_tablas_maestro',methods=['GET'])
+    def get_maestros_name_tables():
+        get_tables = SQLTableInfo()
+        tables_names = get_tables.get_tables_with_keyword()
+        return jsonify({"tables": tables_names})
+    
+    @app.route('/api/maestro/<string:name_table>')
+    def get_maestros_name_data(name_table):
+        manager_table = SQLTableInfo()
+        dataTable = manager_table.get_data(nameTable=name_table)
+        return jsonify(dataTable)
+
 
     return app
 

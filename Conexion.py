@@ -28,20 +28,16 @@ class MainConexion:
             return self.connection
         except Exception as e:
             print("Error opening connection: ", e)
-
     def Open_Conn_Industry(self):
         try:
             self.connection = self.connection_string_industry.connect()
             return self.connection
         except Exception as e:
             print("Error opening connection: ", e)
-
     def _open_session_solmicro(self):
-        return sessionmaker(bind= self.Open_Conn_Solmicro())()
-    
+        return sessionmaker(bind= self.Open_Conn_Solmicro())()    
     def _open_session_industry(self):
         return sessionmaker(bind= self.Open_Conn_Industry())()
-
     def RunProcedure(self,rango):
         conn = None
         try:
@@ -57,8 +53,7 @@ class MainConexion:
         finally:
             if conn:
                 conn.close()
-
-    def GetAutonumericValue(self):
+    def get_autonumeric_value(self):
         conn = None
         try:
             conn = self.Open_Conn_Solmicro()
@@ -74,5 +69,3 @@ class MainConexion:
             if conn:
                 conn.close()
 
-# oo = MainConexion()
-# oo.RunProcedure(rango=94164)
