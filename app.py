@@ -57,14 +57,26 @@ def create_app():
     @app.route('/api/obtener_tablas_maestro',methods=['GET'])
     def get_maestros_name_tables():
         get_tables = SQLTableInfo()
-        tables_names = get_tables.get_tables_with_keyword()
-        return jsonify({"tables": tables_names})
+        tables = get_tables.get_tables_with_keyword()
+        return jsonify(tables)
     
     @app.route('/api/maestro/<string:name_table>')
     def get_maestros_name_data(name_table):
         manager_table = SQLTableInfo()
         dataTable = manager_table.get_data(nameTable=name_table)
         return jsonify(dataTable)
+    
+    @app.route('/api/maestroNew/<string:name_table>')
+    def get_maestros_name_data_new(name_table):
+        manager_table = SQLTableInfo()
+        dataTable = manager_table.get_data_new(nameTable=name_table)
+        return jsonify(dataTable)
+    
+    @app.route('/api/maestroUpdate/<string:name_table>')
+    def get_maestros_update(name_table):
+        manager_table = SQLTableInfo()
+        manager_table.ipdate_into_aleNameTablas(name_table)
+        
 
 
     return app
