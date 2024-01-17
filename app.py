@@ -1,8 +1,9 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
 # from flask_sqlalchemy import SQLAlchemy
 from models.Models import db, OrdenFabricacion, MaestroArticulo
 from InfoTables import SQLTableInfo
+import json
 
 
 def create_app():
@@ -16,6 +17,8 @@ def create_app():
     # Configuración de SQLAlchemy para la conexión a SQL Server
     app.config['SQLALCHEMY_DATABASE_URI'] = f'mssql+pyodbc://{username_solmicro}:{password_solmicro}@{server_solmicro}/{database_solmicro}?driver=ODBC+Driver+17+for+SQL+Server'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    # app.config['JSON_SORT_KEYS'] = False
+    app.json.sort_keys = False
 
     db.init_app(app)
 
@@ -56,27 +59,38 @@ def create_app():
         
     @app.route('/api/obtener_tablas_maestro',methods=['GET'])
     def get_maestros_name_tables():
-        get_tables = SQLTableInfo()
-        tables = get_tables.get_tables_with_keyword()
+        sql_table_Info = SQLTableInfo()
+        tables = sql_table_Info.get_table_data(engine=sql_table_Info.conexion.Open_Conn_Solmicro(),table_name="aleNameTablas")
         return jsonify(tables)
     
     @app.route('/api/maestro/<string:name_table>')
     def get_maestros_name_data(name_table):
-        manager_table = SQLTableInfo()
-        dataTable = manager_table.get_data(nameTable=name_table)
+        sql_table_Info = SQLTableInfo()
+        dataTable = sql_table_Info.get_table_data(engine=sql_table_Info.conexion.Open_Conn_Solmicro(),table_name=name_table)
         return jsonify(dataTable)
     
     @app.route('/api/maestroNew/<string:name_table>')
     def get_maestros_name_data_new(name_table):
-        manager_table = SQLTableInfo()
-        dataTable = manager_table.get_data_new(nameTable=name_table)
-        return jsonify(dataTable)
-    
+        sql_table_Info = SQLTableInfo()
+        dataTable = sql_table_Info.get_table_data(engine=sql_table_Info.conexion.Open_Conn_Solmicro_New(),table_name=name_table)
+        return jsonify(dataTable)    
+
     @app.route('/api/maestroUpdate/<string:name_table>')
     def get_maestros_update(name_table):
         manager_table = SQLTableInfo()
         manager_table.ipdate_into_aleNameTablas(name_table)
-        
+
+    @app.route('/api/comparar/<string:name_table>')
+    def get_coparacion(name_table):
+        sql_table_Info = SQLTableInfo()
+        dataTable = sql_table_Info.get_data_comparar(name_table)
+        return jsonify(dataTable)    
+
+    @app.route('/api/maestroChecked/<string:name_table>')
+    def get_maestros_checked(name_table):
+        manager_table = SQLTableInfo()
+        manager_table.update_checked(name_table)
+    
 
 
     return app
