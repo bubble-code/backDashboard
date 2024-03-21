@@ -60,13 +60,13 @@ def create_app():
     @app.route('/api/obtener_tablas_maestro',methods=['GET'])
     def get_maestros_name_tables():
         sql_table_Info = SQLTableInfo()
-        tables = sql_table_Info.get_table_data(engine=sql_table_Info.conexion.Open_Conn_Solmicro(),table_name="aleNameTablas")
+        tables = sql_table_Info.get_table_data(engine=sql_table_Info.conexion.Open_Conn_Solmicro(),table_name="aleNameTablas",filter="(Name LIKE N'%Maestro%')")
         return jsonify(tables)
     
-    @app.route('/api/maestro/<string:name_table>')
-    def get_maestros_name_data(name_table):
+    @app.route('/api/sumary/<string:name_table>')
+    def get_sumary_table(name_table):
         sql_table_Info = SQLTableInfo()
-        dataTable = sql_table_Info.get_table_data(engine=sql_table_Info.conexion.Open_Conn_Solmicro(),table_name=name_table)
+        dataTable = sql_table_Info.get_sumary_table(engine=sql_table_Info.conexion.Open_Conn_Solmicro(),table_name=name_table)
         return jsonify(dataTable)
     
     @app.route('/api/maestroNew/<string:name_table>')
