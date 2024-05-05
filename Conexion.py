@@ -7,12 +7,15 @@ class MainConexion:
         self.server_industry = r'SERVIDOR'
         self.server_solmicro = r'srvsql'
         self.database_solmicro = 'SolmicroERP6_PruebasSub'
+        self.database_solmicro = 'SolmicroERP6_Favram'
         self.database_solmicro_new = 'SolmicroERP6_Favram'
         self.database_industry = 'IPFavram'
         self.username_solmicro = 'sa'
         self.password_solmicro = 'Altai2021'
         self.password_industry = '71zl6p9h'
         self.connection_string_solmicro = create_engine(
+            f'mssql+pyodbc://{self.username_solmicro}:{self.password_solmicro}@{self.server_solmicro}/{self.database_solmicro}?driver=SQL+Server')
+        self.connection_string_solmicro_dbFavram = create_engine(
             f'mssql+pyodbc://{self.username_solmicro}:{self.password_solmicro}@{self.server_solmicro}/{self.database_solmicro}?driver=SQL+Server')
         self.connection_string_solmicro_new = create_engine(
             f'mssql+pyodbc://{self.username_solmicro}:{self.password_solmicro}@{self.server_solmicro}/{self.database_solmicro_new}?driver=SQL+Server')
@@ -28,6 +31,13 @@ class MainConexion:
     def Open_Conn_Solmicro(self):
         try:
             self.connection = self.connection_string_solmicro.connect()
+            return self.connection
+        except Exception as e:
+            print("Error opening connection: ", e)
+
+    def Open_Conn_Solmicro_DBFavram(self):
+        try:
+            self.connection = self.connection_string_solmicro_dbFavram.connect()
             return self.connection
         except Exception as e:
             print("Error opening connection: ", e)
@@ -52,7 +62,7 @@ class MainConexion:
     def RunProcedure(self,rango):
         conn = None
         try:
-            conn = self.Open_Conn_Solmicro()
+            conn = self.Open_Conn_Solmicro_DBFavram()
             if conn:
                 for dato in range(rango):
                     query = text("EXEC xAutonumericValue;")
@@ -80,3 +90,7 @@ class MainConexion:
             if conn:
                 conn.close()
 
+
+
+obje = MainConexion()
+obje.RunProcedure(rango=(3))

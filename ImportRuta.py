@@ -17,7 +17,7 @@ class Ruta:
             if conn:
                 print("Get DatosArtIndustry")
                 query = text(
-                    f"SELECT Articulo, Fase, Descripcion, TipoFase, Centro, Ritmo, OperariosOperacion, OperariosPreparacion, TiempoPreparacion, TipoUtillaje, CodigoPreparacion, LoteMinimo, LoteLiberacion, FechaDeAlta,FechaUltimaModificacion, UsuarioAlta, UsuarioModificacion, Autocontrol, Version, GuardaVersion, UnidadesPorCiclo, TiempoCiclo, UnidadTiempoCiclo, IDDocumAdjuntos, TiempoHorasPieza, UnidadHorasPieza,CodigoMixProduction, Paralelo, RitmoCrono FROM MFase")
+                    f"SELECT Articulo, Fase, Descripcion, TipoFase, Centro, Ritmo, OperariosOperacion, OperariosPreparacion, TiempoPreparacion, TipoUtillaje, CodigoPreparacion, LoteMinimo, LoteLiberacion, FechaDeAlta,FechaUltimaModificacion, UsuarioAlta, UsuarioModificacion, Autocontrol, Version, GuardaVersion, UnidadesPorCiclo, TiempoCiclo, UnidadTiempoCiclo, IDDocumAdjuntos, TiempoHorasPieza, UnidadHorasPieza,CodigoMixProduction, Paralelo, RitmoCrono FROM MFase where Articulo = N'S01.03.000'")
                 result = conn.execute(query).fetchall()
                 print("Completado")
                 return result                
@@ -60,7 +60,7 @@ class Ruta:
         print("Serializando datos")
         for row in datos:
             result.append({
-                "IDRutaOp": None,
+                "IDRutaOp": 'NULL',
                 "IDArticulo": row[0],
                 "IDRuta": '01',
                 "Secuencia":row[1],
@@ -75,14 +75,14 @@ class Ruta:
                 "UdTiempo": 1,
                 "FactorProduccion": 1,
                 "ControlProduccion": 1,
-                "IDTipoRuta": None,
+                "IDTipoRuta": 'NULL',
                 "TiempoPrep": 0.00000000,
                 "UdTiempoPrep":1,
                 "TiempoEjecUnit": row[24] ,
                 "UdTiempoEjec":1,
-                "FechaCreacionAudi": None,
-                "FechaModificacionAudi": None,
-                "UsuarioAudi": None,
+                "FechaCreacionAudi": 'NULL',
+                "FechaModificacionAudi": 'NULL',
+                "UsuarioAudi": 'NULL',
                 "TiempoCiclo":0.00000000,
                 "UdTiempoCiclo":1,
                 "LoteCiclo":0.00000000,
@@ -91,13 +91,13 @@ class Ruta:
                 "SolapePor": 0.00000000,
                 "Ciclo": 0,
                 "Rendimiento": 100.00000000,
-                "IDCContable": None,
-                "IdDocumentoEspecificacion": None,
+                "IDCContable": 'NULL',
+                "IdDocumentoEspecificacion": 'NULL',
                 "CantidadTiempo100": 0.00000000,
                 "SolapeLote": 0.00000000,
                 "OcupacionMaquina":0.00000000,
-                "Texto":None,
-                "UsuarioCreacionAudi": None,
+                "Texto":'NULL',
+                "UsuarioCreacionAudi": 'NULL',
                 "TiempoProgramacion": row[12]
             })
         print("End Serializado")
@@ -107,17 +107,18 @@ class Ruta:
     def export_to_excel_art_desd_indus(data):
         print("Exporting")
         df = pd.DataFrame(data, columns=['IDRutaOp','IDArticulo',	'IDRuta',	'Secuencia','TipoOperacion','IDOperacion','DescOperacion','Critica','IDCentro','FactorHombre','IDUdProduccion','CantidadTiempo','UdTiempo','FactorProduccion','ControlProduccion','IDTipoRuta','TiempoPrep','UdTiempoPrep','TiempoEjecUnit','UdTiempoEjec','FechaCreacionAudi','FechaModificacionAudi','UsuarioAudi','TiempoCiclo','UdTiempoCiclo','LoteCiclo','PlazoSub','UdTiempoPlazo','SolapePor','Ciclo','Rendimiento','IDCContable','IdDocumentoEspecificacion','CantidadTiempo100','SolapeLote','OcupacionMaquina','Texto','UsuarioCreacionAudi','TiempoProgramacion'])
-        df.to_excel("ImportRuta.xlsx", index=False)
+        df.to_excel("ExportRutaS01.03.000.xlsx", index=False)
         print("End Exportacion")
 
 obj = Ruta()
 input("Creado obj")
 datos_industry = obj.getDatosRutaIndustry()
-print(len(datos_industry))
+print(datos_industry)
 input("continue")
 # missingFases =  obj.checkRuta(data=datos_industry)
 # print(len(missingFases))
 serielized_datos = obj.serializar(datos=datos_industry)
+print(serielized_datos[:10])
 input("continue")
 obj.export_to_excel_art_desd_indus(data=serielized_datos)
 input("continue")

@@ -34,3 +34,6 @@ class ManagerFamilia:
             result.append(MaestroFamilia(row))
         print("Finished")
         return result
+
+
+impFamilia = ManagerFamilia()
