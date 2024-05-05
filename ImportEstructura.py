@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine, text, bindparam, Integer, select, func
 from Conexion import MainConexion
-from ImportArticuloAlmacen import MaestroArticuloAlmacenManager
+
+# from ImportArticuloAlmacen import MaestroArticuloAlmacenManager
 from models.Estructura import TbEstructura
 from CExcel import CExcel
 from sqlalchemy.orm import sessionmaker
@@ -9,33 +10,79 @@ import pandas as pd
 
 class Estructura:
     def __init__(self):
-        self.ruta_archivo = r'ArtFormateados2.xlsx'
-        self.hoja_excel = 'Sheet1'
+        self.ruta_archivo = r"ArtFormateados2.xlsx"
+        self.hoja_excel = "Sheet1"
 
     def getDatosEstructIndustry(self):
         mainConexion = MainConexion()
         try:
             conn = mainConexion.Open_Conn_Industry()
             if conn:
-                print("Get DatosArtIndustry")
+                print("Get Industry estructure")
                 query = text(
-                    f"SELECT Padre, Hijo, PosicionPlano, UnidadesBrutas, UnidadesNetas, PerdidaPreparacion, FechaInicioIngenieria, FechaFinalIngenieria, FabricacionPorLotes, FechaDeAlta, FechaUltimaModificacion, UsuarioAlta, UsuarioModificacion, Version, GuardaVersion, Secuencia, NoGenerar, FaseConsumo, FormulaBrutas, FormulaNetas, PriorizarReservas FROM MConjunto")
+                    f"SELECT Padre, Hijo, PosicionPlano, UnidadesBrutas, UnidadesNetas, PerdidaPreparacion, FechaInicioIngenieria, FechaFinalIngenieria, FabricacionPorLotes, FechaDeAlta, FechaUltimaModificacion, UsuarioAlta, UsuarioModificacion, Version, GuardaVersion, Secuencia, NoGenerar, FaseConsumo, FormulaBrutas, FormulaNetas, PriorizarReservas FROM MConjunto "
+                )
                 result = conn.execute(query).fetchall()
                 print("Completado")
                 return result
-                # grouped_result = {}
-                # for row in result:
-                #     padre = row['Padre']
-                #     if padre not in grouped_result:
-                #         grouped_result[padre] = []
-                #     grouped_result[padre].append(row)
-                # print("Completed")
-                # return grouped_result
+                grouped_result = {}
+                for row in result:
+                    padre = row["Padre"]
+                    if padre not in grouped_result:
+                        grouped_result[padre] = []
+                    grouped_result[padre].append(row)
+                print("Completed")
+                return grouped_result
         except Exception as e:
             print("Error en la consulta:", e)
         finally:
             if conn:
                 conn.close()
+
+    def Check_tbArticuloEstructura_Solmicro(self, listArticulos):
+        mainConexion = MainConexion()
+        resultados = []
+        try:
+            # conn = mainConexion.Open_Conn_Solmicro()
+            conn = mainConexion.Open_Conn_Solmicro_DBFavram()
+            if conn:
+                print("Check articulo in Solmicro")
+                for row in listArticulos:
+                    print(row[0])
+                    query = text(
+                        f"SELECT top(1) IDArticulo FROM tbArticuloEstructura WHERE IDArticulo = N'{row[0]}' "
+                    )
+                    result = conn.execute(query).fetchone()
+                    if not result:
+                        resultados.append(row)
+                conn.commit()
+                conn.close()
+                print("Completado")
+            return resultados
+        except Exception as e:
+            print("Error en la consulta:", e)
+            return resultados
+
+    def serializar_tbArticuloEstructura(self, data):
+        result = []
+        print("Serializando")
+        for row in data:
+            result.append(
+                {
+                    "IDArticulo": row[0],
+                    "IDEstructura": f"01",
+                    "DescEstructura": "Principal",
+                    "Principal": True,
+                    "FechaVigencia": "NULL",
+                    "IDRuta": f"01",
+                    "FechaCreacionAudi": "NULL",
+                    "FechaModificacionAudi": "NULL",
+                    "UsuarioAudi": "NULL",
+                    "UsuarioCreacionAudi": "NULL",
+                }
+            )
+        print("End Serializer")
+        return result
 
     def serializar(self, data):
         result = []
@@ -46,9 +93,9 @@ class Estructura:
                     "IDEstrComp": None,
                     "IDTipoEstructura": None,
                     "IDArticulo": row[0],
-                    "IDEstructura": f'01',
+                    "IDEstructura": f"01",
                     "IDComponente": row[1],
-                    "Cantidad": f'{row[3]}',
+                    "Cantidad": f"{row[3]}",
                     "Merma": 0.00000000,
                     "Secuencia": row[17],
                     "FechaCreacionAudi": None,
@@ -56,64 +103,63 @@ class Estructura:
                     "UsuarioAudi": None,
                     "IDUdMedidaProduccion": None,
                     "Factor": 1.00000000,
-                    "CantidadProduccion": f'{row[3]}',
-                    "UsuarioCreacionAudi": None
+                    "CantidadProduccion": f"{row[3]}",
+                    "UsuarioCreacionAudi": None,
                 }
             )
         print("End Serializer")
         return result
 
-    def chunks(self, list, n):
-        for i in range(0, len(list), n):
-            yeild = list[i:i+n]
+    # def chunks(self, list, n):
+    #     for i in range(0, len(list), n):
+    #         yeild = list[i:i+n]
 
-    def checkImportacion(self):
-        excel = CExcel()
-        list_IDEstrComp = excel.CargarExcel(
-            ruta_archivo=f"ImportEstructura2.xlsx", hoja_excel="Sheet1", columnas=["IDEstrComp","IDArticulo","IDComponente"])
-        print(len(list_IDEstrComp["IDEstrComp"]))
-        resultados = []
-        mainconexion = MainConexion()
-        try:
-            conn = mainconexion.Open_Conn_Solmicro()
-            if conn:
-                print("Starting")
-                query = text(f"SELECT IDEstrComp FROM tbEstructura")
-                result = conn.execute(query).fetchall()
-                result_list = [item[0] for item in result]
-                for idx,row in list_IDEstrComp.iterrows():
-                    if row["IDEstrComp"] not in result_list:
-                        resultados.append(row)
-                conn.close()
-                print("Check completado")
-                return resultados
-        except Exception as e:
-            print("Error en la consulta:", e)
-        finally:
-            if conn:
-                conn.close()
+    # def checkImportacion(self):
+    #     excel = CExcel()
+    #     list_IDEstrComp = excel.CargarExcel(
+    #         ruta_archivo=f"ImportEstructura2.xlsx", hoja_excel="Sheet1", columnas=["IDEstrComp","IDArticulo","IDComponente"])
+    #     print(len(list_IDEstrComp["IDEstrComp"]))
+    #     resultados = []
+    #     mainconexion = MainConexion()
+    #     try:
+    #         conn = mainconexion.Open_Conn_Solmicro()
+    #         if conn:
+    #             print("Starting")
+    #             query = text(f"SELECT IDEstrComp FROM tbEstructura")
+    #             result = conn.execute(query).fetchall()
+    #             result_list = [item[0] for item in result]
+    #             for idx,row in list_IDEstrComp.iterrows():
+    #                 if row["IDEstrComp"] not in result_list:
+    #                     resultados.append(row)
+    #             conn.close()
+    #             print("Check completado")
+    #             return resultados
+    #     except Exception as e:
+    #         print("Error en la consulta:", e)
+    #     finally:
+    #         if conn:
+    #             conn.close()
 
-    def checkMaestroArticulosAlmacen(self):
-        elementos_no_encontrados = []
-        manager_art_almacen = MaestroArticuloAlmacenManager()
-        print("instacia manager")
-        tbEstructu = TbEstructura()
-        print("instacia estructura")
-        id_componente_data = list(set(tbEstructu.get_column_data("IDComponente")))
-        print("lista de componentes",len(id_componente_data))
-        for component in id_componente_data:
-            print(component,len(elementos_no_encontrados))
-            result = manager_art_almacen.filter_by_id(id=component)
-            if not result:
-                elementos_no_encontrados.append(component)
-        print(len(elementos_no_encontrados))
-        print("Elementos no encontrados")
-        data_from_industry = manager_art_almacen.get_data_from_industry(elementos_no_encontrados)
-        print("Data from industry", len(data_from_industry))
-        serialized_data = manager_art_almacen.serializar(data_from_industry)
-        print("Serialized data", len(serialized_data))
-        manager_art_almacen.export_to_excel(name="ArticulosAlmacen.xlsx",data=serialized_data)
-    
+    # def checkMaestroArticulosAlmacen(self):
+    #     elementos_no_encontrados = []
+    #     manager_art_almacen = MaestroArticuloAlmacenManager()
+    #     print("instacia manager")
+    #     tbEstructu = TbEstructura()
+    #     print("instacia estructura")
+    #     id_componente_data = list(set(tbEstructu.get_column_data("IDComponente")))
+    #     print("lista de componentes",len(id_componente_data))
+    #     for component in id_componente_data:
+    #         print(component,len(elementos_no_encontrados))
+    #         result = manager_art_almacen.filter_by_id(id=component)
+    #         if not result:
+    #             elementos_no_encontrados.append(component)
+    #     print(len(elementos_no_encontrados))
+    #     print("Elementos no encontrados")
+    #     data_from_industry = manager_art_almacen.get_data_from_industry(elementos_no_encontrados)
+    #     print("Data from industry", len(data_from_industry))
+    #     serialized_data = manager_art_almacen.serializar(data_from_industry)
+    #     print("Serialized data", len(serialized_data))
+    #     manager_art_almacen.export_to_excel(name="ArticulosAlmacen.xlsx",data=serialized_data)
 
     @staticmethod
     def export_to_excel_art_desd_indus(data):
@@ -123,28 +169,58 @@ class Estructura:
         df.to_excel("ImportRuta.xlsx", index=False)
         print("End Exportacion")
 
+    # @staticmethod
+    # def export_to_excel_missing(data):
+    #     print("Exporting")
+    #     df = pd.DataFrame(data,columns=["IDEstrComp", "IDArticulo", "IDComponente"])
+    #     df.to_excel("MissingStructure.xlsx", index=False)
+    #     print("End Exportacion")
+
     @staticmethod
-    def export_to_excel_missing(data):
+    def export_to_exce_tbArticuloEstructura(data):
         print("Exporting")
-        df = pd.DataFrame(data,columns=["IDEstrComp", "IDArticulo", "IDComponente"])
-        df.to_excel("MissingStructure.xlsx", index=False)
+        df = pd.DataFrame(
+            data,
+            columns=[
+                "IDArticulo",
+                "IDEstructura",
+                "DescEstructura",
+                "Principal",
+                "FechaVigencia",
+                "IDRuta",
+                "FechaCreacionAudi",
+                "FechaModificacionAudi",
+                "UsuarioAudi",
+                "FechaModificacionAudi",
+                "UsuarioCreacionAudi",
+            ],
+        )
+        df.to_excel("ExporttbArticuloEstructura.xlsx", index=False)
         print("End Exportacion")
 
 
 obj = Estructura()
 input("Continue")
-# datos_industry = obj.getDatosEstructIndustry()
-# print(len(datos_industry))
-# input("Continue")
-# serialized_datos = obj.serializar(data=datos_industry)
-# obj.export_to_excel_art_desd_indus(data=serialized_datos)
-# input("Continue")
-# result = obj.checkMaestroArticulosAlmacen()
-result = obj.checkImportacion()
+datos_industry = obj.getDatosEstructIndustry()
+print(len(datos_industry))
 input("Continue")
-print(len(result))
-print("****************************************************************")
-# print(result)
-input("continue")
-obj.export_to_excel_missing(data=result)
-
+# print(datos_industry)
+tbArtEstruc_Check = obj.Check_tbArticuloEstructura_Solmicro(datos_industry)
+print(len(tbArtEstruc_Check))
+input("Continue")
+serialized_tbArticuloEstructura_Solmicro = obj.serializar_tbArticuloEstructura(tbArtEstruc_Check)
+input("Continue")
+obj.export_to_exce_tbArticuloEstructura(serialized_tbArticuloEstructura_Solmicro)
+input("Continue")
+serialized_datos = obj.serializar(data=tbArtEstruc_Check)
+input("Continue")
+obj.export_to_excel_art_desd_indus(data=serialized_datos)
+input("Continue")
+# result = obj.checkMaestroArticulosAlmacen()
+# result = obj.checkImportacion()
+# input("Continue")
+# print(len(result))
+# print("****************************************************************")
+# # print(result)
+# input("continue")
+# obj.export_to_excel_missing(data=result)

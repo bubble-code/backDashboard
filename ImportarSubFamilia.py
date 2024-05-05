@@ -2,12 +2,15 @@ from sqlalchemy import create_engine, text, bindparam, Integer, select
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
 
+from Conexion import MainConexion
+
 
 class GetSubfamilias:
     def __init__(self):
         self.server_industry = r'SERVIDOR'
         self.server_solmicro = r'srvsql'
         self.database_solmicro = 'SolmicroERP6_PruebasSub'
+        self.database_solmicro = 'SolmicroERP6_Favram'
         self.database_industry = 'IPFavram'
         self.username_solmicro = 'sa'
         self.password_solmicro = 'Altai2021'
@@ -38,12 +41,14 @@ class GetSubfamilias:
             print("Error opening connection: ", e)
 
     def get_subfamiliIndustry(self, tipo=1):
+        mainConexion = MainConexion()
         try:
-            conn = self.Open_Conn_Industry()
+            # conn = self.Open_Conn_Industry()
+            conn = mainConexion.Open_Conn_Industry()
             if conn:
                 print("Get sub familia from Industry")
                 query = text(
-                    f"SELECT DISTINCT MFamilia.Codigo, MFamilia.Descripcion, MArticulo.TipoArticulo FROM MFamilia INNER JOIN MArticulo ON MFamilia.Codigo = MArticulo.Familia WHERE (MArticulo.TipoArticulo = N'{tipo}') GROUP BY MFamilia.Codigo, MFamilia.Descripcion")
+                    f"SELECT DISTINCT MFamilia.Codigo, MFamilia.Descripcion, {tipo} as TipoArticulo FROM MFamilia INNER JOIN MArticulo ON MFamilia.Codigo = MArticulo.Familia WHERE (MArticulo.TipoArticulo = N'{tipo}') GROUP BY MFamilia.Codigo, MFamilia.Descripcion")
                 result = conn.execute(query).fetchall()
                 print("Completed")
                 return result
@@ -54,16 +59,18 @@ class GetSubfamilias:
                 conn.close()
 
     def checkSubFamiliaSolmicro(self,listSubfamilia):
+        mainConexion = MainConexion()
         resultados = []
         try:
-            conn = self.Open_Conn_Solmicro()
+            conn = mainConexion.Open_Conn_Solmicro_DBFavram()
             if conn:
                 print("Check subFamilia in Solmicro")
-                for IDSubfamilia, descrip in listSubfamilia:
-                    query = text(f"SELECT top(1) IDSubfamilia FROM tbMaestroSubfamilia WHERE IDFamilia = 'VENTACLIEN'  and IDSubfamilia = N'{IDSubfamilia}' ")
+                for item in listSubfamilia:
+                    print(item[0])
+                    query = text(f"SELECT top(1) IDSubfamilia FROM tbMaestroSubfamilia WHERE IDFamilia = 'VENTACLIEN'  and IDSubfamilia = N'{item[0]}' ")
                     result = conn.execute(query).fetchone()
                     if not result:
-                        resultados.append(IDSubfamilia)
+                        resultados.append(item)
                 conn.commit()
                 conn.close()
                 print("Completado")
@@ -83,14 +90,14 @@ class GetSubfamilias:
     @staticmethod
     def export_subFamilias_excel(subFamiliasList):
         print("Exporting")
-        df = pd.DataFrame(subFamiliasList,columns=["SubFamilias"])
+        df = pd.DataFrame(subFamiliasList,columns=["SubFamilias","Description","Tipo"])
         df.to_excel("Subfamilias.xlsx", index=False)
         print("End Exportacion")
 
 
 obj = GetSubfamilias()
-listSubfamiliaIndustry = obj.get_subfamiliIndustry(tipo=4)
-print(len(listSubfamiliaIndustry))
+listSubfamiliaIndustry = obj.get_subfamiliIndustry(tipo=1)
+print(listSubfamiliaIndustry)
 input("Continuar")
 checkSubFamiliaSolmicro = obj.checkSubFamiliaSolmicro(listSubfamilia=listSubfamiliaIndustry)
 input("Continuar")
